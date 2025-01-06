@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dox/pages/source_card.dart';
 import 'package:dox/pages/web_sockets.dart';
 import 'package:flutter/material.dart';
@@ -12,17 +10,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String content = "";
-  String sources = "";
   TextEditingController searchController = TextEditingController();
   @override
   void initState() {
-    ChatWebService().connect();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    print("whole build rebuilt");
+    String content = "";
     GlobalKey<FormState> formKey = GlobalKey<FormState>();
     return SafeArea(
       child: Scaffold(
@@ -36,6 +33,7 @@ class _HomePageState extends State<HomePage> {
                   StreamBuilder(
                       stream: ChatWebService().searchStream,
                       builder: (context, snapshot) {
+                        print("Sources stream rebuilt");
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return Center(
@@ -98,6 +96,8 @@ class _HomePageState extends State<HomePage> {
                     height: 50,
                     child: MaterialButton(
                       onPressed: () {
+                        ChatWebService().connect();
+                        content = "";
                         if (formKey.currentState!.validate()) {
                           ChatWebService().send(searchController.text);
                         }
@@ -121,6 +121,7 @@ class _HomePageState extends State<HomePage> {
                   StreamBuilder(
                     stream: ChatWebService().contentStream,
                     builder: (context, snapshot) {
+                      print("content stream rebuilt");
                       // Check if snapshot has data and it's not null
                       if (snapshot.hasData && snapshot.data != null) {
                         try {
@@ -150,6 +151,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     super.dispose();
+    ChatWebService().disconnect();
+
     searchController.dispose();
   }
 }

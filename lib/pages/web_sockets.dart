@@ -16,6 +16,7 @@ class ChatWebService {
   Stream<Map<String, dynamic>> get contentStream => _contentController.stream;
   ChatWebService._internal();
   void connect() async {
+    if (_socket == null) {}
     _socket =
         WebSocketChannel.connect(Uri.parse("ws://localhost:8000/ws/chat"));
     await _socket!.ready;
@@ -33,5 +34,9 @@ class ChatWebService {
 
   void send(String query) {
     _socket!.sink.add(json.encode({"query": query}));
+  }
+
+  void disconnect() {
+    _socket!.sink.close();
   }
 }
