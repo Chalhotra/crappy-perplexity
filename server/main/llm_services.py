@@ -26,6 +26,7 @@ class LLMServices:
 
         Please provide a comprehensive, detailed, well-cited accurate response using the above context. 
         Think and reason deeply. Ensure it answers the query the user is asking. Do not use your knowledge until it is absolutely necessary.
+        Send the response in markdown please.
         """
 
 

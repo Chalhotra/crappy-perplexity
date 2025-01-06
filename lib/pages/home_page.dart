@@ -1,6 +1,7 @@
 import 'package:dox/pages/source_card.dart';
 import 'package:dox/pages/web_sockets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage> {
                       stream: ChatWebService().searchStream,
                       builder: (context, snapshot) {
                         print("Sources stream rebuilt");
+                        print(snapshot.connectionState);
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return Center(
@@ -44,13 +46,16 @@ class _HomePageState extends State<HomePage> {
                           List<dynamic> cardDatas = data!["data"];
 
                           return SingleChildScrollView(
-                            child: Row(
+                            child: Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              runAlignment: WrapAlignment.start,
                               children: [
                                 for (var i in cardDatas)
                                   SourceCard(
-                                      title: i['title'] ?? '',
-                                      url: i['url'] ?? '',
-                                      content: i['content'] ?? '')
+                                    title: i['title'] ?? '',
+                                    url: i['url'] ?? '',
+                                  )
                               ],
                             ),
                           );
@@ -129,7 +134,11 @@ class _HomePageState extends State<HomePage> {
                           Map<String, dynamic> data = snapshot.data!;
                           // Check if content exists within the decoded data
                           content += data["data"];
-                          return Text(content);
+                          print(content);
+                          return Markdown(
+                            data: content,
+                            shrinkWrap: true,
+                          );
                         } catch (e) {
                           // Handle any JSON decoding errors gracefully
                           print("Error decoding JSON: $e");
