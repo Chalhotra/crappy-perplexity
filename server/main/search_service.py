@@ -7,12 +7,11 @@ class SearchServices:
 
         results = []
 
-        response = tavily_client.search(query, max = 10)
+        response = tavily_client.search(query, max = 10, include_images=True)
 
-        search_results = response.get("results", [])
+        search_results = {"results": response.get("results", []), "images": response.get("images", [])}
 
-        # downloaded = [{"title": results[i].get("title", ""), "content": trafilatura.fetch_url(results.get("url", ""))} for i in results]
-        for result in search_results:
+        for result in search_results["results"]:
             downloaded = trafilatura.fetch_url(result.get("url"))
             content  = trafilatura.extract(downloaded, include_comments=False)
 
@@ -20,10 +19,11 @@ class SearchServices:
                 {
                     "title": result.get("title", ""),
                     "url": result.get("url", ""),
-                    "content": content 
+                    "content": content,
                 }
             )
-        return results
+        images = search_results["images"]
+        return results, images
 
 
 

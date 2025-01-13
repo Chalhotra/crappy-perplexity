@@ -22,7 +22,8 @@ async def websocket_chat_endpoint(websocket: WebSocket):
         data = await websocket.receive_json()
         query = data['query']
         print(query)
-        downloaded = search_services.web_search(query)
+        downloaded, images = search_services.web_search(query)
+
         print(downloaded)
         sorted_results = sort_results_services.sort_results(query, downloaded)
         await asyncio.sleep(0.2)
@@ -31,11 +32,16 @@ async def websocket_chat_endpoint(websocket: WebSocket):
         for chunk in llm_services.search_results(query=query, content=sorted_results):
             await asyncio.sleep(0.2)
             await websocket.send_json({"type": "content", "data": chunk})
+        await asyncio.sleep(0.2
+        )
+        for image in images:
+            print(image)
+            await websocket.send_json({"type": "images", "data": image  })
 
         
     except Exception as e:
         print(e)
-    finally:
+    finally:    
         await websocket.close()
 
 

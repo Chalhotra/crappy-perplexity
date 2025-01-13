@@ -7,29 +7,40 @@ class ChatWebService {
 
   factory ChatWebService() => _instance;
   WebSocketChannel? _socket;
+  StreamSubscription? _socketSub;
 
   final StreamController<Map<String, dynamic>> _contentController =
       StreamController<Map<String, dynamic>>();
   final StreamController<Map<String, dynamic>> _searchController =
       StreamController<Map<String, dynamic>>();
+
+  final StreamController<Map<String, dynamic>> _imagesController =
+      StreamController<Map<String, dynamic>>();
+
+  Stream<Map<String, dynamic>> get imageStream => _imagesController.stream;
   Stream<Map<String, dynamic>> get searchStream => _searchController.stream;
   Stream<Map<String, dynamic>> get contentStream => _contentController.stream;
+
   ChatWebService._internal();
   void connect() async {
-    if (_socket == null) {}
+    disconnect(); // Close the existing socket and controllers before reconnecting
     _socket =
         WebSocketChannel.connect(Uri.parse("ws://localhost:8000/ws/chat"));
-    await _socket!.ready;
 
-    _socket!.stream.listen((message) {
-      print(message);
-      var data = json.decode(message);
-      if (data["type"] == "search_results") {
-        _searchController.add(data);
-      } else {
-        _contentController.add(data);
-      }
-    });
+    try {
+      _socketSub = _socket!.stream.listen((message) {
+        var data = json.decode(message);
+        if (data["type"] == "search_results") {
+          _searchController.add(data);
+        } else if (data["type"] == "content") {
+          _contentController.add(data);
+        } else if (data["type"] == "images") {
+          _imagesController.add(data);
+        }
+      });
+    } catch (e) {
+      print("Socket exception: " + e.toString());
+    }
   }
 
   void send(String query) {
@@ -37,6 +48,10 @@ class ChatWebService {
   }
 
   void disconnect() {
-    _socket!.sink.close();
+    print("Disconnecting from streams and socket");
+    _socketSub?.cancel();
+    _socketSub = null; // Reset to prevent reuse of the canceled subscription
+    _socket?.sink.close(); // Properly close the WebSocket connection
+    _socket = null;
   }
 }
