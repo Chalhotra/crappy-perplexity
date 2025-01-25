@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'source_card.dart';
 import 'web_sockets.dart';
 
 class ResultsPage extends StatefulWidget {
   final String query;
-  const ResultsPage({required this.query, Key? key}) : super(key: key);
+  const ResultsPage({required this.query, super.key});
 
   @override
   State<ResultsPage> createState() => _ResultsPageState();
@@ -82,6 +81,8 @@ class _ResultsPageState extends State<ResultsPage> {
     _contentSub = null;
     _imageSub?.cancel();
     _imageSub = null;
+
+    print("contentSub: $_contentSub ");
   }
 
   @override
@@ -92,6 +93,7 @@ class _ResultsPageState extends State<ResultsPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(content);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(title: Text("Results")),

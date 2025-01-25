@@ -10,12 +10,12 @@ class ChatWebService {
   StreamSubscription? _socketSub;
 
   final StreamController<Map<String, dynamic>> _contentController =
-      StreamController<Map<String, dynamic>>();
+      StreamController<Map<String, dynamic>>.broadcast();
   final StreamController<Map<String, dynamic>> _searchController =
-      StreamController<Map<String, dynamic>>();
+      StreamController<Map<String, dynamic>>.broadcast();
 
   final StreamController<Map<String, dynamic>> _imagesController =
-      StreamController<Map<String, dynamic>>();
+      StreamController<Map<String, dynamic>>.broadcast();
 
   Stream<Map<String, dynamic>> get imageStream => _imagesController.stream;
   Stream<Map<String, dynamic>> get searchStream => _searchController.stream;
@@ -39,7 +39,7 @@ class ChatWebService {
         }
       });
     } catch (e) {
-      print("Socket exception: " + e.toString());
+      print("Socket exception: $e");
     }
   }
 
